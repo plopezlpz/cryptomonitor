@@ -1,7 +1,7 @@
-# Crypto watch 
+# Crypto monitor 
 Monitors real time crypto prices from different exchanges.
 
-## Quick start
+## Quick start
 Server
 ```sh
 cd server
