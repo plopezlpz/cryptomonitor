@@ -17,8 +17,8 @@ class App extends Component {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Container maxWidth="md">
-          <h1>Hello BCB</h1>
-          <TickerTable/>
+          <h1>Realtime last prices</h1>
+          <TickerTable />
         </Container>
       </ThemeProvider>
     );

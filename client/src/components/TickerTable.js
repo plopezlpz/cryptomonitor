@@ -1,4 +1,5 @@
-import React from "react";
+import React, { Component } from "react";
+import { connect } from "react-redux";
 import {
   Paper,
   Table,
@@ -8,39 +9,62 @@ import {
   TableHead,
   TableRow
 } from "@material-ui/core";
+import _ from "lodash";
+import { getTickers, updateTicker } from "../actions/ticker";
+import { onTickerUpdated } from "../updateTickerWS";
+import AnimateOnChange from "react-animate-on-change";
 
-function createData(ticker, cexio, bitfinex) {
-  return { ticker, cexio, bitfinex };
-}
+class TickerTable extends Component {
+  componentDidMount() {
+    this.props.getTickers();
+    onTickerUpdated(ticket => {
+      this.props.updateTicker(ticket);
+    });
+  }
 
-const rows = [
-  createData("BTC-USD", 7009.93, 7002),
-  createData("ETH-USD", 150, 151),
-];
-
-export default function TickerTable(props) {
-  return (
-    <TableContainer component={Paper}>
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Tickers</TableCell>
-            <TableCell align="right">Cexio</TableCell>
-            <TableCell align="right">Bitfinex</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map(row => (
-            <TableRow hover role="checkbox" key={row.ticker}>
-              <TableCell component="th" scope="row">
-                {row.ticker}
-              </TableCell>
-              <TableCell align="right">{row.cexio}</TableCell>
-              <TableCell align="right">{row.bitfinex}</TableCell>
+  render() {
+    const { tickers, pairs, exchanges } = this.props;
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Tickers</TableCell>
+              {exchanges.map(exchange => (
+                <TableCell align="right" key={exchange}>
+                  {_.capitalize(exchange)}
+                </TableCell>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+          </TableHead>
+          <TableBody>
+            {pairs.map(pair => (
+              <TableRow hover role="checkbox" key={pair}>
+                <TableCell component="th" scope="row">
+                  {pair}
+                </TableCell>
+                {exchanges.map(exchange => (
+                  <TableCell align="right" key={exchange}>
+                    {tickers[exchange][pair]}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
 }
+
+const mapStateToProps = state => {
+  return {
+    tickers: state.tickers,
+    exchanges: _.keys(state.tickers),
+    pairs: _.keys(state.tickers[_.keys(state.tickers)[0]])
+  };
+};
+
+export default connect(mapStateToProps, { getTickers, updateTicker })(
+  TickerTable
+);
