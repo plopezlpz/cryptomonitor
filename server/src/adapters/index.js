@@ -2,13 +2,15 @@ const { getCexioTickers, onCexioTicker } = require("./cexio");
 const { getBitfinexTickers, onBitfinexTicker } = require("./bitfinex");
 
 async function getTickersFromExchanges() {
-  const cexioTickers = await getCexioTickers();
-  const bitfinexTickers = await getBitfinexTickers();
-  // Add exchanges here
+  const tickers = await Promise.all([
+    getCexioTickers(),
+    getBitfinexTickers(),
+    // Add exchanges here
+  ]);
 
   return {
-    cexio: cexioTickers,
-    bitfinex: bitfinexTickers,
+    cexio: tickers[0],
+    bitfinex: tickers[1],
   };
 }
 
